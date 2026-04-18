@@ -1528,14 +1528,14 @@ mod tests {
 
     #[test]
     fn parses_unicode_symbol_in_verifier() {
-        let p = must_parse("(GE .營收 0)");
+        let p = must_parse("(GE .哥們 0)");
         match p.expr.node {
             BoolExpr::Verifier { left, .. } => {
                 assert_eq!(
                     left.node,
                     ValueExpr::Symbol {
                         root: SymbolRoot::Root,
-                        path: "營收".into()
+                        path: "哥們".into()
                     }
                 );
             }
