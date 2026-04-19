@@ -34,8 +34,7 @@ pub enum EvalPredicate {
 
 /// Evaluate a quantifier (`ForAll` / `Exists`) over its operand.
 ///
-/// Per the PRD:
-/// - Operand must be `List`; `Map` is a `TypeError` (use `GetKeys` / `GetValues`).
+/// - Operand must be `List`, `Map` is a `TypeError` (use `GetKeys` / `GetValues`).
 /// - Scalar fallback: when the operand is a scalar or `Null`, the quantifier
 ///   reduces to a single predicate application.
 /// - Empty list: `ForAll` is vacuously `true`, `Exists` is `false`.
