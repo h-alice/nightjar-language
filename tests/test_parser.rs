@@ -102,8 +102,8 @@ fn top_level_bool_literal_parses() {
 }
 
 #[test]
-fn combined_example_from_prd_section_11() {
-    // A handful of examples from PRD §11 should all parse cleanly.
+fn combined_examples() {
+    // A handful of examples should all parse cleanly.
     for src in [
         "(GE .revenue 0)",
         "(NonEmpty .)",

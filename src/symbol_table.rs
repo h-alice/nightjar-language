@@ -426,8 +426,8 @@ mod tests {
 
     #[cfg(feature = "json")]
     #[test]
-    fn prd_example_matches_symbol_table_layout() {
-        // From PRD §6.2: the flattened table must include both intermediate
+    fn example_matches_symbol_table_layout() {
+        // The flattened table must include both intermediate
         // maps and leaf scalars under their fully qualified paths.
         let j = serde_json::json!({
             "data": {
