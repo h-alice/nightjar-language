@@ -229,8 +229,7 @@ mod tests {
 
     #[test]
     fn eq_bool_vs_int_is_type_error() {
-        // Booleans and ints are distinct types — comparing them is an error
-        // (per the PRD's strict no-coercion rule outside Int↔Float).
+        // Booleans and ints are distinct types, comparing them is an error
         let err = v(VerifierOp::EQ, Entity::Bool(true), Entity::Int(1)).unwrap_err();
         assert!(matches!(err, NightjarLanguageError::TypeError { .. }));
     }
