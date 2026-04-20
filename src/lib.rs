@@ -25,7 +25,7 @@ pub mod executor;
 pub mod language;
 pub mod symbol_table;
 
-// ── Phase 1 (parser) public surface ──────────────────────────────
+// ─────────────────────────── parser ───────────────────────────
 pub use error::{ErrorCode, NightjarLanguageError, Span};
 pub use language::grammar::{
     BoolExpr, FuncOp, Keyword, Literal, Predicate, Program, QuantifierOp, Spanned, SpannedBoolExpr,
@@ -33,7 +33,7 @@ pub use language::grammar::{
 };
 pub use language::parser::{parse, parse_with_config, ParserConfig};
 
-// ── Phase 2 (runtime + executor) public surface ──────────────────
+// ───────────────────── runtime & executor ──────────────────────
 pub use context::entity::{Entity, TypeTag};
 pub use executor::{exec_entity, ExecOptions, ExecResult};
 pub use symbol_table::SymbolTable;
