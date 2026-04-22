@@ -85,12 +85,10 @@ impl<'a> Tokenizer<'a> {
         loop {
             // Loop until EOF.
             self.skip_whitespace(); // Skip encountered whitespace.
-            if self.is_eof() {
-                // Exit if EOF.
-                break;
-            }
+            let Some(c) = self.peek_char() else {
+                break; // EOF reached, exit the loop.
+            };
             let start = self.byte_pos(); // Record the next-unconsumed byte offset.
-            let c = self.peek_char().expect("Runtime error, unexpected EOF"); // NOTE: This should never happen.
             let token = match c {
                 '(' => {
                     self.advance();
@@ -134,7 +132,7 @@ impl<'a> Tokenizer<'a> {
     }
 
     /// `true` when no more characters remain to tokenize.
-    fn is_eof(&self) -> bool {
+    fn _is_eof(&self) -> bool {
         self.cursor >= self.chars.len()
     }
 
@@ -620,7 +618,9 @@ impl Parser {
         match kw.node { // Match boolean expressions over keywords
             Keyword::EQ | Keyword::NE | Keyword::LT | Keyword::LE | Keyword::GT | Keyword::GE => {
                 // All verifiers take exactly two arguments.
-                let op = VerifierOp::from_keyword(kw.node).unwrap(); // NOTE: double check if unwrap is safe
+                let op = VerifierOp::from_keyword(kw.node).ok_or_else(|| {
+                    parse_error(kw.span, "internal: expected verifier keyword")
+                })?;
                 let left = self.parse_value_expr()?;  // Left expression
                 let right = self.parse_value_expr()?; // Right expression
 
@@ -678,7 +678,9 @@ impl Parser {
             }
 
             Keyword::ForAll | Keyword::Exists => {
-                let op = QuantifierOp::from_keyword(kw.node).unwrap();
+                let op = QuantifierOp::from_keyword(kw.node).ok_or_else(|| {
+                    parse_error(kw.span, "internal: expected quantifier keyword")
+                })?;
                 let predicate = self.parse_predicate()?; // Predicates are partial-fulfiled verifiers
                 let operand = self.parse_value_expr()?;
                 let close = self.expect_rparen()?;
