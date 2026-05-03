@@ -1,7 +1,16 @@
 # Nightjar Language
 
-A declarative, prefix-notation DSL for formal verification of structured data,
-delivered as an embeddable Rust library.
+<center>
+<a href="https://macaulaylibrary.org/asset/59333171"><img src="savanna_nightjar_by_craig_brelsford.jpeg" width="400" /></a>
+</center>
+<center><sub>Savanna Nightjar by Craig Brelsford; Cornell Lab of Ornithology | Macaulay Library</sub></center>
+
+---
+
+
+Project Nightjar is named after the nightjar (Caprimulgus affinis), a bird that catches bugs.
+
+Nightjar language is a declarative, prefix-notation DSL for formal verification of structured data, delivered as an embeddable Rust library.
 
 Nightjar expressions look like this:
 
@@ -18,29 +27,29 @@ Given a data payload, every expression reduces to exactly one of three outcomes:
 
 The three-valued result is central: a well-formed "no" is not the same thing as
 an ill-formed expression. Both are reported, both carry a source span, both can
-be acted on by the host. Named after the nightjar — a bird that catches bugs —
+be acted on by the host.
+
 this crate is the language engine of the broader Nightjar verification framework.
 
----
+## Overview
 
-## Table of contents
-
-1. [When to reach for it](#when-to-reach-for-it)
+1. [What is this project for](#what-is-this-project-for)
 2. [A 30-second taste](#a-30-second-taste)
 3. [Installation](#installation)
 4. [The language at a glance](#the-language-at-a-glance)
 5. [Using the library](#using-the-library)
-6. [Building clients — worked examples](#building-clients--worked-examples)
+6. [Building clients and working examples](#building-clients-and-working-examples)
 7. [Error handling in practice](#error-handling-in-practice)
 8. [Safety and performance notes](#safety-and-performance-notes)
 9. [Further reading](#further-reading)
-10. [License](#license)
+10. [Acknowledgments](#acknowledgments)
+11. [License](#license)
 
 ---
 
-## When to reach for it
+## What is this project for
 
-**Good fit.**
+**Target**
 
 - Validating API request / response payloads against declarative rules.
 - Config, rule-set, or policy validation where the rules themselves are data
@@ -49,36 +58,29 @@ this crate is the language engine of the broader Nightjar verification framework
 - Anywhere you want to store a validation predicate as a short, auditable text
   string and evaluate it later.
 
-**Not a fit.**
+**Not a target**
 
-- General-purpose programming. Nightjar has no variables, no loops, no I/O,
-  no user-defined functions, no side effects, no module system.
-- Anything that must mutate state or call out to other systems.
+- Nightjar language is not designed to support general-purpose programming.
+  Currently no supports for user-defined variables, loops, I/O, and functions.
 
 Nightjar is intentionally small; complexity belongs in the host application.
 
----
 
 ## A 30-second taste
 
 Each of these is a complete, runnable Nightjar expression. They grow in power.
 
-```text
-;; 1. Look up a field and compare to a literal.
-(GT .revenue 0)
 
-;; 2. Combine assertions with logical connectives.
-(AND (GE .revenue 0) (LT .revenue 1000000))
+### 1. Look up a field and compare to a literal.
+> (GT .revenue 0)
 
-;; 3. Assert a property of every element in a list, using `@` to refer
-;;    to the current element. Here: every test result's expected field
-;;    equals its actual field.
-(ForAll (EQ @.expected @.actual) .results)
-```
+### 2. Combine assertions with logical connectives.
+> (AND (GE .revenue 0) (LT .revenue 1000000))
 
-(Semicolon lines are only for this README. Nightjar has no comment syntax.)
+### 3. Assert a property of every element in a list
+> (ForAll (EQ @.expected @.actual) .results)
 
----
+using `@` to refer to the current element being inspected.
 
 ## Installation
 
@@ -105,21 +107,25 @@ Features:
 | `json`  | yes     | `exec(expr, json_value, opts)`, `SymbolTable::from_json`, `From<serde_json::Value> for Entity` |
 | `yaml`  | no      | `serde_yaml` dependency (reserved for YAML data bridges) |
 
-Nightjar targets stable Rust, edition 2021, and the standard library. No
-`no_std`, no WASM target today.
-
----
+Nightjar project targets stable Rust, edition 2021, and the standard library. No
+`no_std`, no WASM target for now (maybe later or never :P).
 
 ## The language at a glance
 
-Everything is `(Operator arg1 arg2 …)`. Prefix notation eliminates operator
-precedence; parentheses are the only grouping mechanism.
+Nightjar language uses prefix notation, everything is `(Operator arg1 arg2 …)`.
+
+Prefix notation eliminates operator
+precedence, parentheses are the only grouping mechanism.
 
 ### Types
 
-Seven runtime types. No implicit coercion except one targeted exception:
+This is a list of supported runtime types.
+
+Basically no implicit coercion allowed except one targeted exception:
 `Int` auto-promotes to `Float` when the other operand of an arithmetic
-function or a comparison verifier is a `Float`. Everything else that mixes
+function or a comparison verifier is a `Float` (this fits our common sense, right?).
+
+Everything else that mixes
 types is a `TypeError`.
 
 | Type     | Example literals            | Notes                                         |
@@ -132,7 +138,7 @@ types is a `TypeError`.
 | `Map`    | (built from host data)      | String-keyed, heterogeneous, hash-backed      |
 | `Null`   | `Null`                      | Always "empty" for `NonEmpty` purposes        |
 
-### Symbols — how expressions talk to data
+### Symbols: how expressions connect to data
 
 There are two symbol namespaces:
 
@@ -143,8 +149,10 @@ There are two symbol namespaces:
   predicate; using `@` outside one is a `ScopeError` (caught at parse time).
   Examples: `@.a`, `@._1.name`, bare `@` = the whole current element.
 
-Paths are dot-separated. Segments are Unicode-aware — `.營收`, `.données.résultat`
-are all valid keys. For lists, elements are addressed with `_0`, `_1`, … (0-based):
+Paths are dot-separated. Segments are Unicode-aware, for example, `.站點營收`, `.données.résultat`
+are all valid keys. 
+
+For lists, elements are addressed with `_0`, `_1`, … (0-based):
 
 ```text
 (GT .ids._1 15)            ;; second element of .ids > 15
@@ -153,9 +161,7 @@ are all valid keys. For lists, elements are addressed with `_0`, `_1`, … (0-ba
 
 ### Operator cheat-sheet
 
-All operators are tabulated below. For full semantics — edge cases, empty
-inputs, NaN handling, the exact rules each operator enforces — see
-[SUPPLEMENT.md](SUPPLEMENT.md).
+Below is a list of supported operators. 
 
 **Verifiers** (two values → `Bool`).
 `EQ`, `NE`, `LT`, `LE`, `GT`, `GE`.
@@ -192,9 +198,6 @@ Examples:
 | `Neg` | 1     |                                                    |
 | `Abs` | 1     |                                                    |
 
-Integer arithmetic is checked — overflow produces `IntegerOverflow`, not
-wraparound.
-
 **String** (strings → string or int).
 
 | Op          | Arity | Notes                                               |
@@ -216,11 +219,13 @@ wraparound.
 | `GetKeys`   | 1     | Map → sorted list of String keys (deterministic order)      |
 | `GetValues` | 1     | Map → list of values, sorted by key (deterministic order)   |
 
----
+**Note**: For full semantics, edge cases, empty
+inputs, NaN handling, the exact rules each operator enforces, see
+[SUPPLEMENT.md](SUPPLEMENT.md).
 
 ## Using the library
 
-The full public API is re-exported from the crate root (`use nightjar_lang::*`).
+The full public API can be imported from the crate root (`use nightjar_lang::*`).
 
 ### The one-line path
 
@@ -304,27 +309,7 @@ let opts = ExecOptions {
 - `max_depth` is the parser's nesting-depth guard. Pathological input
   exceeding it produces a `RecursionError` before any evaluation happens.
 
-### Parse once, evaluate many
-
-`exec`/`exec_entity` re-parse the expression on every call. For hot loops,
-parse up-front with `parse` or `parse_with_config` and hold onto the `Program`:
-
-```rust
-use nightjar_lang::{parse, Program};
-
-let program: Program = parse("(GE .revenue 0)").expect("rule syntax");
-// ... later, re-use `program` against many payloads.
-```
-
-The current public `exec` entry points always go through the full parse →
-evaluate path; if you need to amortize parsing across many payloads, keep the
-`Program` around and wrap your own evaluation loop (the AST is fully public in
-`nightjar_lang::{BoolExpr, ValueExpr, …}`). The public evaluator is exposed via
-`exec_entity`; a future release may add a `Program`-accepting entry point.
-
----
-
-## Building clients — worked examples
+## Building clients and working examples
 
 Three complete, runnable clients demonstrating the intended embedding patterns.
 Each assumes the `Cargo.toml` from the [Installation](#installation) section.
@@ -398,7 +383,9 @@ echo '{"revenue": 4200}' \
 
 An Axum handler that accepts `POST /validate` with body
 `{"rule": "...", "data": {...}}` and responds with `200 True`, `400 False`,
-or `400 Error + diagnostic`. Drop-in pattern for any Rust web framework;
+or `400 Error + diagnostic`.
+
+This may be the golden pattern for any Rust web framework, and
 the `ExecResult` → HTTP mapping is the part that matters.
 
 ```toml
@@ -526,7 +513,6 @@ fn main() -> std::io::Result<()> {
 }
 ```
 
----
 
 ## Error handling in practice
 
@@ -561,7 +547,6 @@ The ten error codes:
 For the exact triggering conditions and minimal reproducers of each code,
 see [SUPPLEMENT.md](SUPPLEMENT.md).
 
----
 
 ## Safety and performance notes
 
@@ -572,26 +557,31 @@ see [SUPPLEMENT.md](SUPPLEMENT.md).
   `HashMap<String, Entity>` built once per evaluation: every intermediate
   map/list path is registered. Lookup during evaluation is then O(1) per
   root-rooted symbol.
-- **List size is the host's responsibility.** Very large lists grow the
+- **Take care of the size of list.** Very large lists grow the
   flattened table linearly (one entry per element, plus nested paths).
   Trim, sample, or page large collections upstream before injecting them.
 - **Determinism.** `Map` uses `HashMap` internally, but `GetKeys` /
   `GetValues` sort by key, so operators that iterate maps produce the same
   output every run.
 - **Checked arithmetic.** Integer ops never wrap silently; float ops never
-  overflow to zero — overflow surfaces as `IntegerOverflow` (E009) and bad
+  overflow to zero, overflow surfaces as `IntegerOverflow` (E009) and bad
   float input surfaces via ordinary IEEE 754 (NaN comparisons return `false`).
 
----
 
 ## Further reading
 
-- [SUPPLEMENT.md](SUPPLEMENT.md) — full EBNF grammar, complete operator
+- [SUPPLEMENT.md](SUPPLEMENT.md) has full EBNF grammar, complete operator
   semantics (including every edge case), architecture reference, full error
   table, and a guide to extending the language (adding new functions,
   operators, or types).
 
----
+
+## Acknowledgments
+
+**Nat Lee** for providing Claude code subscription, thank you!
+
+Portions of this codebase were generated with the assistance of Claude Opus 4.6. The human developers maintain full authorship and have conducted rigorous testing, refactoring, and validation of the final codebase.
+
 
 ## License
 
