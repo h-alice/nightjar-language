@@ -2,8 +2,9 @@
 
 <center>
 <a href="https://macaulaylibrary.org/asset/59333171"><img src="savanna_nightjar_by_craig_brelsford.jpeg" width="400" /></a>
+<br/>
+<sub>Savanna Nightjar by Craig Brelsford; Cornell Lab of Ornithology | Macaulay Library</sub>
 </center>
-<center><sub>Savanna Nightjar by Craig Brelsford; Cornell Lab of Ornithology | Macaulay Library</sub></center>
 
 ---
 
