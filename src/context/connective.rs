@@ -15,14 +15,17 @@
 
 //! Boolean operation implementations.
 
+/// Logical conjunction: returns `true` only when both operands are `true`.
 pub fn apply_and(left: bool, right: bool) -> bool {
     left && right
 }
 
+/// Logical disjunction: returns `true` when either operand is `true`.
 pub fn apply_or(left: bool, right: bool) -> bool {
     left || right
 }
 
+/// Logical negation: returns the boolean opposite of the input.
 pub fn apply_not(value: bool) -> bool {
     !value
 }

@@ -32,7 +32,9 @@ use thiserror::Error;
 /// tokenizer only records positions at char boundaries.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Span {
+    /// Inclusive start byte offset.
     pub start: usize,
+    /// Exclusive end byte offset.
     pub end: usize,
 }
 
@@ -64,93 +66,144 @@ impl Span {
 /// - E010: ScopeError
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ErrorCode {
-    E001, // ParseError
-    E002, // TypeError
-    E003, // ArgumentError
-    E004, // SymbolNotFound
-    E005, // AmbiguousSymbol (reserved for shorthand mode)
-    E006, // DivisionByZero
-    E007, // RecursionError
-    E008, // IndexError
-    E009, // IntegerOverflow
-    E010, // ScopeError
+    /// Parse error: expression does not conform to the grammar.
+    E001,
+    /// Type error:operator applied to incompatible types.
+    E002,
+    /// Argument error: wrong operand count for an operator.
+    E003,
+    /// Symbol not found: symbol path is not present in the payload.
+    E004,
+    /// Ambiguous symbol: reserved for a future shorthand-lookup mode.
+    E005,
+    /// Division by zero in `Div` or `Mod`.
+    E006,
+    /// Recursion error: AST nesting exceeded `max_depth`.
+    E007,
+    /// Index error: `Get`/`Head`/`Tail` ran off the end of a list.
+    E008,
+    /// Integer overflow during checked arithmetic.
+    E009,
+    /// Scope error: `@` symbol used outside any quantifier predicate.
+    E010,
 }
 
 /// Unified error type for the entire crate.
 #[derive(Debug, Clone, Error, PartialEq)]
 pub enum NightjarLanguageError {
+    /// Expression does not conform to the grammar (E001).
     #[error("[{code:?}] Parse error at {span:?}: {message}")]
     ParseError {
+        /// Source span of the offending token.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// Operator applied to incompatible types (E002).
     #[error("[{code:?}] Type error at {span:?}: {message}")]
     TypeError {
+        /// Source span of the offending expression.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// Wrong number of operands for an operator (E003).
     #[error("[{code:?}] Argument error at {span:?}: {message}")]
     ArgumentError {
+        /// Source span of the offending call.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// Symbol path not present in the payload (E004).
     #[error("[{code:?}] Symbol not found at {span:?}: {message}")]
     SymbolNotFound {
+        /// Source span of the offending symbol reference.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// Reserved for a future shorthand-lookup mode; not raised today (E005).
     #[error("[{code:?}] Ambiguous symbol at {span:?}: {message}")]
     AmbiguousSymbol {
+        /// Source span of the offending symbol reference.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// `Div` or `Mod` invoked with a zero divisor (E006).
     #[error("[{code:?}] Division by zero at {span:?}: {message}")]
     DivisionByZero {
+        /// Source span of the offending operation.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// AST nesting exceeded the configured `max_depth` (E007).
     #[error("[{code:?}] Recursion depth limit exceeded at {span:?}: {message}")]
     RecursionError {
+        /// Source span at which the limit was exceeded.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// `Get`/`Head`/`Tail` ran off the end of a list (E008).
     #[error("[{code:?}] Index out of bounds at {span:?}: {message}")]
     IndexError {
+        /// Source span of the offending operation.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// Checked integer arithmetic overflowed (E009).
     #[error("[{code:?}] Integer overflow at {span:?}: {message}")]
     IntegerOverflow {
+        /// Source span of the offending operation.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 
+    /// `@` element-relative symbol used outside any quantifier predicate (E010).
     #[error("[{code:?}] Scope error at {span:?}: {message}")]
     ScopeError {
+        /// Source span of the offending symbol reference.
         span: Span,
+        /// Stable error code.
         code: ErrorCode,
+        /// Human-readable diagnostic.
         message: String,
     },
 }
 
 impl NightjarLanguageError {
+    /// Source span of the error within the original expression text.
     pub fn span(&self) -> Span {
         match self {
             NightjarLanguageError::ParseError { span, .. }
@@ -166,6 +219,7 @@ impl NightjarLanguageError {
         }
     }
 
+    /// Stable [`ErrorCode`] tag identifying the error variant.
     pub fn code(&self) -> ErrorCode {
         match self {
             NightjarLanguageError::ParseError { code, .. }
@@ -181,6 +235,7 @@ impl NightjarLanguageError {
         }
     }
 
+    /// Human-readable diagnostic message attached to the error.
     pub fn message(&self) -> &str {
         match self {
             NightjarLanguageError::ParseError { message, .. }

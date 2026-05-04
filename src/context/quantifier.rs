@@ -28,7 +28,15 @@ use crate::language::grammar::{QuantifierOp, UnaryCheckOp, VerifierOp};
 /// been reduced to an Entity.
 #[derive(Debug, Clone)]
 pub enum EvalPredicate {
-    PartialVerifier { op: VerifierOp, bound: Entity },
+    /// Partial binary verifier such as `(GT 0)` with its bound argument
+    /// already reduced to an [`Entity`].
+    PartialVerifier {
+        /// Verifier operator (e.g. `GT`, `EQ`).
+        op: VerifierOp,
+        /// Reduced bound value applied to each element.
+        bound: Entity,
+    },
+    /// Unary check predicate such as `NonEmpty`.
     UnaryCheck(UnaryCheckOp),
 }
 

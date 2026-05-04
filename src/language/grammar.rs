@@ -123,15 +123,18 @@ use crate::error::Span;
 
 /// Spanned wrapper
 ///
-/// Every AST node and token is wrapped in Spanned<T> so source positions
+/// Every AST node and token is wrapped in `Spanned<T>` so source positions
 /// are preserved through parsing and into runtime errors.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Spanned<T> {
+    /// The wrapped AST node or token value.
     pub node: T,
+    /// Source span of the node within the original expression.
     pub span: Span,
 }
 
 impl<T> Spanned<T> {
+    /// Construct a [`Spanned`] from a node and its source [`Span`].
     pub const fn new(node: T, span: Span) -> Self {
         Self { node, span }
     }
@@ -164,7 +167,12 @@ pub enum Token {
     /// i.e. bare root/element has an empty path.
     ///
     /// `root` records which namespace (`.` or `@`) the token was written in.
-    Symbol { root: SymbolRoot, path: String },
+    Symbol {
+        /// The symbol namespace (`.` or `@`).
+        root: SymbolRoot,
+        /// Dot-joined segment path **without** the leading sigil.
+        path: String,
+    },
 }
 
 /// Discriminator for which namespace a symbol path is rooted in.
@@ -174,7 +182,10 @@ pub enum Token {
 ///   nearest enclosing `ForAll`/`Exists` (the `@` sigil).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SymbolRoot {
+    /// Root-rooted symbol (`.`), resolved against the whole input.
     Root,
+    /// Element-rooted symbol (`@`), resolved against the current iteration
+    /// element of the nearest enclosing quantifier.
     Element,
 }
 
@@ -183,42 +194,65 @@ pub enum SymbolRoot {
 /// All reserved keywords (operators, special names).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Keyword {
-    // Verifiers
+    /// Equality verifier `EQ`.
     EQ,
+    /// Inequality verifier `NE`.
     NE,
+    /// Less-than verifier `LT`.
     LT,
+    /// Less-than-or-equal verifier `LE`.
     LE,
+    /// Greater-than verifier `GT`.
     GT,
+    /// Greater-than-or-equal verifier `GE`.
     GE,
-    // Unary check
+    /// Unary `NonEmpty` check.
     NonEmpty,
-    // Connectives
+    /// Logical conjunction `AND`.
     AND,
+    /// Logical disjunction `OR`.
     OR,
+    /// Logical negation `NOT`.
     NOT,
-    // Quantifiers
+    /// Universal quantifier `ForAll`.
     ForAll,
+    /// Existential quantifier `Exists`.
     Exists,
-    // Arithmetic
+    /// Arithmetic addition `Add`.
     Add,
+    /// Arithmetic subtraction `Sub`.
     Sub,
+    /// Arithmetic multiplication `Mul`.
     Mul,
+    /// Arithmetic division `Div`.
     Div,
+    /// Arithmetic modulo `Mod`.
     Mod,
+    /// Arithmetic negation `Neg`.
     Neg,
+    /// Arithmetic absolute value `Abs`.
     Abs,
-    // String
+    /// String concatenation `Concat`.
     Concat,
+    /// String length `Length` (Unicode scalar count).
     Length,
+    /// String substring `Substring` (char-indexed).
     Substring,
+    /// String upper-case conversion `Upper`.
     Upper,
+    /// String lower-case conversion `Lower`.
     Lower,
-    // Collection
+    /// List head accessor `Head`.
     Head,
+    /// List tail accessor `Tail`.
     Tail,
+    /// List/map element accessor `Get`.
     Get,
+    /// Container size accessor `Count`.
     Count,
+    /// Map keys accessor `GetKeys`.
     GetKeys,
+    /// Map values accessor `GetValues`.
     GetValues,
 }
 
@@ -274,11 +308,17 @@ impl Keyword {
 /// Verifiers are binary operators that return a boolean.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VerifierOp {
+    /// Equality.
     EQ,
+    /// Inequality.
     NE,
+    /// Less-than.
     LT,
+    /// Less-than-or-equal.
     LE,
+    /// Greater-than.
     GT,
+    /// Greater-than-or-equal.
     GE,
 }
 
@@ -302,6 +342,8 @@ impl VerifierOp {
 /// As name suggested, these operators are special verifiers that only take one operand.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnaryCheckOp {
+    /// `NonEmpty` — false for `Null` and empty `String`/`List`/`Map`,
+    /// true otherwise.
     NonEmpty,
 }
 
@@ -320,7 +362,9 @@ impl UnaryCheckOp {
 /// These operators are used to quantify over a collection.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QuantifierOp {
+    /// Universal quantifier — predicate must hold for every element.
     ForAll,
+    /// Existential quantifier — predicate must hold for at least one element.
     Exists,
 }
 
@@ -340,23 +384,41 @@ impl QuantifierOp {
 /// These operators are used to perform some operations on values.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FuncOp {
+    /// Arithmetic addition (binary).
     Add,
+    /// Arithmetic subtraction (binary).
     Sub,
+    /// Arithmetic multiplication (binary).
     Mul,
+    /// Arithmetic division (binary); errors on divide-by-zero.
     Div,
+    /// Arithmetic modulo (binary); errors on divide-by-zero.
     Mod,
+    /// Arithmetic negation (unary).
     Neg,
+    /// Arithmetic absolute value (unary).
     Abs,
+    /// String concatenation (binary).
     Concat,
+    /// String length in Unicode scalars (unary).
     Length,
+    /// String substring `(Substring s start len)` (ternary, char-indexed).
     Substring,
+    /// String upper-case conversion (unary, Unicode-aware).
     Upper,
+    /// String lower-case conversion (unary, Unicode-aware).
     Lower,
+    /// First element of a list (unary); errors on empty.
     Head,
+    /// All but the first element of a list (unary); errors on empty.
     Tail,
+    /// Indexed accessor: `(Get list Int)` or `(Get map String)` (binary).
     Get,
+    /// Size of a list or map (unary).
     Count,
+    /// Sorted list of map keys (unary).
     GetKeys,
+    /// Map values sorted by key (unary).
     GetValues,
 }
 
@@ -441,10 +503,15 @@ impl FuncOp {
 /// 123, 45.6, true, false, null)
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
+    /// 64-bit signed integer literal.
     Int(i64),
+    /// IEEE-754 double-precision float literal.
     Float(f64),
+    /// UTF-8 string literal.
     String(String),
+    /// Boolean literal (`True` / `False`).
     Bool(bool),
+    /// `Null` literal.
     Null,
 }
 
@@ -461,18 +528,23 @@ pub type SpannedValueExpr = Spanned<ValueExpr>;
 /// Top-level program, must evaluate to Boolean.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Program {
+    /// Root boolean expression of the program.
     pub expr: SpannedBoolExpr,
 }
 
 /// Boolean-producing expressions.
 #[derive(Debug, Clone, PartialEq)]
 pub enum BoolExpr {
+    /// Boolean literal `True` or `False`.
     Literal(bool),
 
     /// Verifier takes two values, evaluates, and returns a boolean.
     Verifier {
+        /// Verifier operator.
         op: VerifierOp,
+        /// Left-hand value expression.
         left: Box<SpannedValueExpr>,
+        /// Right-hand value expression.
         right: Box<SpannedValueExpr>,
     },
 
@@ -487,14 +559,19 @@ pub enum BoolExpr {
 
     /// Boolean-producing checks which only take one operand.
     UnaryCheck {
+        /// Unary check operator.
         op: UnaryCheckOp,
+        /// Operand value expression.
         operand: Box<SpannedValueExpr>,
     },
 
     /// Quantifier takes a predicate and an operand, and returns a boolean.
     Quantifier {
+        /// Quantifier operator.
         op: QuantifierOp,
+        /// Predicate applied to each element.
         predicate: Spanned<Predicate>,
+        /// Collection-producing operand.
         operand: Box<SpannedValueExpr>,
     },
 }
@@ -507,6 +584,7 @@ pub enum BoolExpr {
 /// - Results from function calls: `(Add 1 2)`, `(Sub 1 2)`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ValueExpr {
+    /// Immediate literal value.
     Literal(Literal),
     /// A symbol reference.
     ///
@@ -517,11 +595,14 @@ pub enum ValueExpr {
     Symbol {
         /// The root type (namespace, *local* `@` or *global* `.``)
         root: SymbolRoot,
-        // The dot-joined path segments (empty string = bare root/element)
+        /// The dot-joined path segments (empty string = bare root/element).
         path: String,
     },
+    /// Function-call expression that reduces to a value.
     FuncCall {
+        /// Function operator being invoked.
         op: FuncOp,
+        /// Argument value expressions.
         args: Vec<SpannedValueExpr>,
     },
 }
@@ -542,7 +623,9 @@ pub enum Predicate {
     ///
     /// For example, `(EQ @.a)`, notice that the second argument is missing.
     PartialVerifier {
+        /// Verifier operator.
         op: VerifierOp,
+        /// Pre-supplied operand; the iteration element fills the missing slot.
         bound: Box<SpannedValueExpr>,
     },
     /// Unary check, used in quantifiers.

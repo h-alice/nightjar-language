@@ -2,9 +2,16 @@
 name = "nightjar-lang"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.75"
 description = "A declarative, prefix-notation DSL for formal verification of structured data."
 license = "Apache-2.0"
 authors = ["Wayne Hong (h-alice) <contact@halice.art>"]
+repository = "https://github.com/h-alice/nightjar-language"
+homepage = "https://github.com/h-alice/nightjar-language"
+documentation = "https://docs.rs/nightjar-lang"
+readme = "README.md"
+keywords = ["dsl", "verification", "validation", "policy", "lisp"]
+categories = ["parser-implementations", "config", "data-structures"]
 
 [features]
 default = ["json"]
@@ -19,3 +26,17 @@ thiserror = "2"
 
 [dev-dependencies]
 proptest = "1"
+axum = "0.7"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[[example]]
+name = "cli_validator"
+required-features = ["json"]
+
+[[example]]
+name = "batch_checker"
+required-features = ["json"]
+
+[[example]]
+name = "web_service"
+required-features = ["json"]

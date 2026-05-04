@@ -50,20 +50,27 @@ impl Default for ExecOptions {
 /// Three-valued execution result.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ExecResult {
+    /// The assertion holds.
     True,
+    /// The assertion does not hold.
     False,
+    /// The assertion could not be evaluated; the wrapped
+    /// [`NightjarLanguageError`] carries the diagnostic.
     Error(NightjarLanguageError),
 }
 
 impl ExecResult {
+    /// Return `true` when the result is [`ExecResult::True`].
     pub fn is_true(&self) -> bool {
         matches!(self, ExecResult::True)
     }
 
+    /// Return `true` when the result is [`ExecResult::False`].
     pub fn is_false(&self) -> bool {
         matches!(self, ExecResult::False)
     }
 
+    /// Return `true` when the result is [`ExecResult::Error`].
     pub fn is_error(&self) -> bool {
         matches!(self, ExecResult::Error(_))
     }
@@ -255,6 +262,7 @@ fn eval_bool(
 /// let v = eval_value(&expr, &st, &ExecOptions::default(), None).unwrap();
 /// assert_eq!(v, Entity::Int(42));
 /// ```
+#[allow(clippy::only_used_in_recursion)]
 fn eval_value(
     expr: &SpannedValueExpr,
     symbols: &SymbolTable,

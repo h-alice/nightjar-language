@@ -16,8 +16,10 @@
 // Crate root. Re-exports the Phase 1 (parser) and Phase 2 (executor/runtime)
 // public surfaces of the Nightjar verification DSL.
 
-//! Nightjar Language — a declarative, prefix-notation DSL for formal
+//! Nightjar Language is a declarative, prefix-notation DSL for formal
 //! verification of structured data.
+
+#![warn(missing_docs)]
 
 pub mod context;
 pub mod error;

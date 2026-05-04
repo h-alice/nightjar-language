@@ -24,12 +24,19 @@ use std::fmt;
 /// Type tags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TypeTag {
+    /// 64-bit signed integer.
     Int,
+    /// IEEE-754 double-precision float.
     Float,
+    /// UTF-8 string.
     String,
+    /// Boolean.
     Bool,
+    /// Ordered, heterogeneous list.
     List,
+    /// String-keyed, heterogeneous map.
     Map,
+    /// Absence of value.
     Null,
 }
 
@@ -51,16 +58,24 @@ impl fmt::Display for TypeTag {
 /// The fundamental data-holding unit.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Entity {
+    /// 64-bit signed integer.
     Int(i64),
+    /// IEEE-754 double-precision float.
     Float(f64),
+    /// UTF-8 string.
     String(String),
+    /// Boolean.
     Bool(bool),
+    /// Ordered, heterogeneous list of entities.
     List(Vec<Entity>),
+    /// String-keyed map of entities.
     Map(HashMap<String, Entity>),
+    /// Absence of value.
     Null,
 }
 
 impl Entity {
+    /// Return the [`TypeTag`] corresponding to this entity's variant.
     pub fn type_tag(&self) -> TypeTag {
         match self {
             Entity::Int(_) => TypeTag::Int,

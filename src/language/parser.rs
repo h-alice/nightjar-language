@@ -175,7 +175,7 @@ impl<'a> Tokenizer<'a> {
     ///
     /// If so, it will return `true`, otherwise `false`.
     fn is_negative_literal(&self) -> bool {
-        self.peek_char() == Some('-') && self.peek_char_at(1).map_or(false, |c| c.is_ascii_digit())
+        self.peek_char() == Some('-') && self.peek_char_at(1).is_some_and(|c| c.is_ascii_digit())
         // If the character is not alphabetic, it can't be a digit.
     }
 
@@ -235,7 +235,7 @@ impl<'a> Tokenizer<'a> {
         let mut is_float = false; // A flag indicating whether the number is a float.
         if self.peek_char() == Some('.') && // Current char is '.'
             self.peek_char_at(1)            // Next char is a digit
-                .map_or(false, |c| c.is_ascii_digit())
+                .is_some_and(|c| c.is_ascii_digit())
         {
             // If next char is a digit, then it is a float.
             is_float = true;
@@ -1160,8 +1160,8 @@ mod tests {
 
     #[test]
     fn tokenizes_negative_float_literal() {
-        let toks = tokenize("-3.14");
-        assert_eq!(toks, vec![Token::FloatLiteral(-3.14)]);
+        let toks = tokenize("-2.71828");
+        assert_eq!(toks, vec![Token::FloatLiteral(-2.71828)]);
     }
 
     #[test]

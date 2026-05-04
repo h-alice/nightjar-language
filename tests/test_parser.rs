@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-//! Phase 1 integration tests
+//! Integration tests
 
 use nightjar_lang::{parse, NightjarLanguageError};
 

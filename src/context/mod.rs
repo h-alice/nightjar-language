@@ -12,12 +12,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-// Context module root. Groups the runtime evaluators for entities, functions,
-// verifiers, connectives, and quantifiers.
 
+//! Context module root.
+//!
+//! Groups the runtime evaluators for entities, functions, verifiers,
+//! connectives, and quantifiers.
+
+pub mod connective;
 pub mod entity;
 pub mod function;
-pub mod verifier;
-pub mod connective;
 pub mod quantifier;
+pub mod verifier;

@@ -108,7 +108,7 @@ impl SymbolTable {
 /// returns the root itself.
 ///
 /// Segments beginning with `_` are treated as list indices (e.g. `_0`, `_12`),
-/// matching the flattening convention in [`flatten`].
+/// matching the flattening convention used by [`SymbolTable::from_entity`].
 ///
 /// Any other traversal shape (indexing into a scalar, missing key, missing index)
 /// results in an appropriate [`NightjarLanguageError`] carrying the supplied `span`.

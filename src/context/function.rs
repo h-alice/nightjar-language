@@ -131,8 +131,13 @@ pub fn apply_function(
                 .checked_div(y)
                 .map(Entity::Int)
                 .ok_or_else(|| integer_overflow(span, "Div")),
-            NumericPair::FloatFloat(_, y) if y == 0.0 => Err(division_by_zero(span)),
-            NumericPair::FloatFloat(x, y) => Ok(Entity::Float(x / y)),
+            NumericPair::FloatFloat(x, y) => { // Fix redundant guard
+                if y == 0.0 {
+                    Err(division_by_zero(span))
+                } else {
+                    Ok(Entity::Float(x / y))
+                }
+            }
         },
         FuncOp::Mod => match numeric_pair(&args[0], &args[1], span, "Mod")? {
             NumericPair::IntInt(_, 0) => Err(division_by_zero(span)),
@@ -140,8 +145,13 @@ pub fn apply_function(
                 .checked_rem(y)
                 .map(Entity::Int)
                 .ok_or_else(|| integer_overflow(span, "Mod")),
-            NumericPair::FloatFloat(_, y) if y == 0.0 => Err(division_by_zero(span)),
-            NumericPair::FloatFloat(x, y) => Ok(Entity::Float(x % y)),
+            NumericPair::FloatFloat(x, y) => { // Fix redundant guard
+                if y == 0.0 {
+                    Err(division_by_zero(span))
+                } else {
+                    Ok(Entity::Float(x % y))
+                }
+            }
         },
         FuncOp::Neg => match &args[0] {
             Entity::Int(x) => x

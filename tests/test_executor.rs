@@ -13,7 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Phase 2 integration tests.
+//! Integration tests.
+
+#![cfg(feature = "json")]
 
 use nightjar_lang::{exec, ExecOptions, ExecResult, NightjarLanguageError};
 use serde_json::json;
