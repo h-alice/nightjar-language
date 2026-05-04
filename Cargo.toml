@@ -10,8 +10,8 @@ repository = "https://github.com/h-alice/nightjar-language"
 homepage = "https://github.com/h-alice/nightjar-language"
 documentation = "https://docs.rs/nightjar-lang"
 readme = "README.md"
-keywords = ["dsl", "verification", "validation", "policy", "lisp"]
-categories = ["parser-implementations", "config", "data-structures"]
+keywords = ["dsl", "verification", "data-validation", "rules", "parser"]
+categories = ["parser-implementations", "compilers", "development-tools"]
 
 [features]
 default = ["json"]
