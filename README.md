@@ -97,7 +97,7 @@ nightjar-lang = "0.1"
 # Core only — no JSON bridge, smaller dependency tree.
 # nightjar-lang = { version = "0.1", default-features = false }
 
-# Opt into YAML support (brings in serde_yaml).
+# Opt into YAML support (brings in serde_yml).
 # nightjar-lang = { version = "0.1", features = ["yaml"] }
 ```
 
@@ -106,7 +106,7 @@ Features:
 | Feature | Default | What it brings                                           |
 |---------|---------|----------------------------------------------------------|
 | `json`  | yes     | `exec(expr, json_value, opts)`, `SymbolTable::from_json`, `From<serde_json::Value> for Entity` |
-| `yaml`  | no      | `serde_yaml` dependency (reserved for YAML data bridges) |
+| `yaml`  | no      | `serde_yml` dependency (reserved for YAML data bridges)  |
 
 Nightjar project targets stable Rust, edition 2021, and the standard library. No
 `no_std`, no WASM target for now (maybe later or never :P).

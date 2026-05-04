@@ -16,12 +16,12 @@ categories = ["parser-implementations", "config", "data-structures"]
 [features]
 default = ["json"]
 json = ["dep:serde_json"]
-yaml = ["dep:serde_yaml"]
+yaml = ["dep:serde_yml"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", optional = true }
-serde_yaml = { version = "0.9", optional = true }
+serde_yml = { version = "0.0.12", optional = true }
 thiserror = "2"
 
 [dev-dependencies]
