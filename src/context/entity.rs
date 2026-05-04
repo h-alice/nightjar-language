@@ -232,7 +232,7 @@ mod tests {
         assert_eq!(Entity::from(json!(true)), Entity::Bool(true));
         assert_eq!(Entity::from(json!(42)), Entity::Int(42));
         assert_eq!(Entity::from(json!(-7)), Entity::Int(-7));
-        assert_eq!(Entity::from(json!(3.14)), Entity::Float(3.14));
+        assert_eq!(Entity::from(json!(1.618)), Entity::Float(1.618));
         assert_eq!(
             Entity::from(json!("abc")),
             Entity::String("abc".to_string())

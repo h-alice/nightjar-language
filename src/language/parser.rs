@@ -1160,8 +1160,8 @@ mod tests {
 
     #[test]
     fn tokenizes_negative_float_literal() {
-        let toks = tokenize("-2.71828");
-        assert_eq!(toks, vec![Token::FloatLiteral(-2.71828)]);
+        let toks = tokenize("-1.618");
+        assert_eq!(toks, vec![Token::FloatLiteral(-1.618)]);
     }
 
     #[test]

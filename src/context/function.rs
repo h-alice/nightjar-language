@@ -131,7 +131,8 @@ pub fn apply_function(
                 .checked_div(y)
                 .map(Entity::Int)
                 .ok_or_else(|| integer_overflow(span, "Div")),
-            NumericPair::FloatFloat(x, y) => { // Fix redundant guard
+            NumericPair::FloatFloat(x, y) => {
+                // Fix redundant guard
                 if y == 0.0 {
                     Err(division_by_zero(span))
                 } else {
@@ -145,7 +146,8 @@ pub fn apply_function(
                 .checked_rem(y)
                 .map(Entity::Int)
                 .ok_or_else(|| integer_overflow(span, "Mod")),
-            NumericPair::FloatFloat(x, y) => { // Fix redundant guard
+            NumericPair::FloatFloat(x, y) => {
+                // Fix redundant guard
                 if y == 0.0 {
                     Err(division_by_zero(span))
                 } else {
